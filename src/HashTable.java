@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
@@ -75,6 +76,7 @@ public class HashTable<K, V> implements Iterable<KeyValue<K, V>> {
 
     public boolean addOrReplace(K key, V value) {
         int slotNumber = findSlotNumber(key);
+        growIfNeeded();
 
         if (this.slots[slotNumber] == null) {
             this.slots[slotNumber] = new LinkedList<>();
@@ -89,7 +91,6 @@ public class HashTable<K, V> implements Iterable<KeyValue<K, V>> {
 
         this.slots[slotNumber].add(new KeyValue<>(key, value));
         this.count++;
-        growIfNeeded();
         return true; // Adding a new value
     }
 
@@ -104,7 +105,7 @@ public class HashTable<K, V> implements Iterable<KeyValue<K, V>> {
             }
         }
 
-        throw new NoSuchElementException("Key not found");
+        throw new NoSuchElementException("Key not found: " + key);
     }
 
     public KeyValue<K, V> find(K key) {
@@ -118,11 +119,21 @@ public class HashTable<K, V> implements Iterable<KeyValue<K, V>> {
             }
         }
 
-        return null;
+        throw new NoSuchElementException("Key not found: " + key);
     }
 
     public boolean containsKey(K key) {
-        return find(key) != null;
+        int slotNumber = findSlotNumber(key);
+
+        if (this.slots[slotNumber] != null) {
+            for (KeyValue<K, V> entry : this.slots[slotNumber]) {
+                if (entry.getKey().equals(key)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     public boolean remove(K key) {
@@ -212,7 +223,7 @@ public class HashTable<K, V> implements Iterable<KeyValue<K, V>> {
 
     @Override
     public Iterator<KeyValue<K, V>> iterator() {
-        return new Iterator<KeyValue<K, V>>(){
+        return new Iterator<KeyValue<K, V>>() {
             private int index = 0;
             private Iterator<KeyValue<K, V>> slotIterator = slots[index] == null ? null : slots[index].iterator();
 
@@ -240,5 +251,14 @@ public class HashTable<K, V> implements Iterable<KeyValue<K, V>> {
                 return slotIterator.next();
             }
         };
+    }
+
+    @Override
+    public String toString() {
+        return "HashTable{" +
+                "slots=" + Arrays.toString(slots) +
+                ", capacity=" + capacity +
+                ", size=" + count +
+                '}';
     }
 }

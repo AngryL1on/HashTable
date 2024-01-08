@@ -1,5 +1,11 @@
-public class Main{
+import java.util.Random;
+
+public class Main {
     public static void main(String[] args) {
+        manualInit();
+    }
+
+    private static void manualInit() {
         HashTable<String, String> hashTable = new HashTable<>();
 
         // Adding elements
@@ -40,5 +46,13 @@ public class Main{
         for (String value : hashTable.values()) {
             System.out.println(value);
         }
+    }
+
+    private static void automaticalInit() {
+        HashTable<String, Integer> hashTable = new HashTable<>();
+        for (int i = 0; i < 10000; i++) {
+            hashTable.add("A" + new Random().nextInt(1, 1000), i);
+        }
+        System.out.println(hashTable);
     }
 }
